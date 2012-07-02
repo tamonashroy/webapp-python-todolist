@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="description" content="A javascript based todo list" />
+<meta name="keywords" content="todolist task list" />
+<link rel="stylesheet" type="text/css" href="stylesheets/style.css" />		
+<title>A Cool Todo List</title>
+	<link rel="stylesheet" href="stylesheets/jquery.ui.all.css">
+	<script src="stylesheets/jquery-1.7.2.js"></script>
+	<script src="stylesheets/jquery.ui.core.js"></script>
+	<script src="stylesheets/jquery.ui.widget.js"></script>
+	<script src="stylesheets/jquery.ui.mouse.js"></script>
+	<script src="stylesheets/jquery.ui.sortable.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				$('#sb').focus();
+				$( "#incomplete" ).sortable();
+				$( "#incomplete" ).disableSelection();
+			})
+			function complete(h)
+			{ 
+				$.get("/complete", {"id":h});
+				var li = $('#' + h);
+				li.appendTo('#complete');
+				li.children("input").attr("onclick","return incomplete('" + h +"')");
+				$('<a href="#" onclick="return dele(' + "'" + h + "'" + ');"> delete</a>').appendTo(li);
+				//$('#sb').focus();
+				
+			}
+			function incomplete(h)
+			{ 
+				$.get("/incomplete", {"id":h});
+				var li = $('#' + h);
+				li.children("a").remove();
+				li.appendTo('#incomplete');
+				li.children("input").attr("onclick","return complete('" + h +"')");
+				$('#sb').focus();
+				
+			}
+			function dele(h)
+			{ 
+				//alert(h);
+				var c = confirm("sure delete?");
+				if (c)
+				{
+					$.get("/delete", {"id":h});
+					var li = $('#' + h)
+					li.fadeOut();
+				}
+			}
+		</script>
+	<head>
+	<body>
+<div id="wrap">
+
+<div id="header">
+<h1>Cool Todo List</h1>
+<h2>A javascript todolist. Add your tasks, check checkbox to mark complete, drag to sort your list.</h2>
+</div>
+
+<div id="topmenu">
+<form method="post" action=".">
+			<input type="text" name="todo" id="sb"/>
+			<input type="submit" value="Add Item"/>
+		</form>
+</div>
+
+<div id="content">
+		<a href="{{url}}">{{url_text}}</a>
+		
+		<h2>Active Items</h2>
+		<ol id="incomplete">
+		{% for t in activetodo %}
+		  <li id="{{t.key}}"> <input type="checkbox" onclick="return complete('{{t.key}}');" value="hello"/>{{t.todo}}</li>
+		{% endfor %}
+		</ol>
+		<h2>Completed Items</h2>
+		<ul id="complete">
+		{% for t in completetodo %}
+		  <li id="{{t.key}}">
+			<input type="checkbox"  checked="checked" onclick="return incomplete('{{t.key}}');"/>
+			{{t.todo}} <a href="#" onclick="return dele('{{t.key}}');">delete</a>
+		</li>
+		{% endfor %}
+		</ul>
+<div class="clear"> </div>
+
+</div>
+
+
+<div class="clear"> </div>
+
+<div id="footer">
+
+<div class="left">
+Copyright &copy; 2012 <a href="#">Cool </a>
+</div>
+
+<div class="right"> 
+<!-- Please consider leaving the credit - link back to our website in the footer intact or if you want to remove it please buy link back free license on http://www.simpletemplates.org/simple-website-template-1.html
+-->
+Design by <a href="http://www.simpletemplates.org">Simple Website Templates</a>
+</div>
+
+<div class="clear"> </div>
+
+</div>
+
+</div>
+</body>
+</html>
